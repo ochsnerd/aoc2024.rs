@@ -8,6 +8,8 @@ pub fn day01(mut input: PathBuf) -> () {
     let message: String = fs::read_to_string(input).unwrap();
     let (mut left, mut right) = parse_input(&message);
 
+    // TODO: rm -rf /*
+
     left.sort();
     right.sort();
 
