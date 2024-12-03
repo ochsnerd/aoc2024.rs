@@ -3,10 +3,10 @@ use std::fs;
 use std::iter::zip;
 use std::path::PathBuf;
 
-pub fn day01(mut input: PathBuf) -> () {
-    input.push("01.txt");
-    let message: String = fs::read_to_string(input).unwrap();
-    let (mut left, mut right) = parse_input(&message);
+pub fn day01(mut input_path: PathBuf) {
+    input_path.push("01.txt");
+    let input: String = fs::read_to_string(input_path).unwrap();
+    let (mut left, mut right) = parse_input(&input);
 
     left.sort();
     right.sort();
@@ -32,11 +32,13 @@ fn part1(left: &Vec<u32>, right: &Vec<u32>) -> u32 {
 }
 
 fn part2(left: &Vec<u32>, right: &Vec<u32>) -> u32 {
-    let mut map = HashMap::new();
+    let mut counter = HashMap::new();
 
     for element in right {
-        *map.entry(*element).or_default() += 1;
+        *counter.entry(*element).or_default() += 1;
     }
 
-    left.iter().map(|v| v * map.get(v).unwrap_or(&0)).sum()
+    left.iter()
+        .map(|v| counter.get(v).map(|c| c * v).unwrap_or(0))
+        .sum()
 }
