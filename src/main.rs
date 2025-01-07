@@ -5,7 +5,8 @@ use clap::Parser;
 mod day01;
 mod day02;
 mod day03;
-mod day06;
+mod day04;
+// mod day06;
 
 #[derive(Parser)]
 struct Args {
@@ -20,6 +21,7 @@ fn main() {
 	1 => day01::day01(input),
 	2 => day02::day02(input),
 	3 => day03::day03(input),
-	_ => day06::day06(input),
+	_ => day04::day04(input),
+	// _ => day06::day06(input),
     }
 }

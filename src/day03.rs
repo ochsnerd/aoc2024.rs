@@ -39,6 +39,7 @@ fn parse_next(data: ParseState) -> Result<(ParseState, (u32, u32)), ParseState> 
     Ok((r5, if r5.1 { (num1, num2) } else { (0, 0) }))
 }
 
+#[allow(dead_code)]
 fn drop_until_part1<'a>(data: ParseState<'a>, prefix: &str) -> ParseState<'a> {
     match data.0.split_once(prefix) {
         Some((_, rest)) => (rest, true),
