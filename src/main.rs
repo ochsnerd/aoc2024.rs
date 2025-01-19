@@ -1,4 +1,3 @@
-
 use std::path::PathBuf;
 use clap::Parser;
 
@@ -7,7 +6,7 @@ mod day02;
 mod day03;
 mod day04;
 mod day05;
-// mod day06;
+mod day06;
 
 #[derive(Parser)]
 struct Args {
@@ -23,7 +22,7 @@ fn main() {
 	2 => day02::day02(input),
 	3 => day03::day03(input),
 	4 => day04::day04(input),
-	_ => day05::day05(input),
-	// _ => day06::day06(input),
+	5 => day05::day05(input),
+	_ => day06::day06(input),
     }
 }
