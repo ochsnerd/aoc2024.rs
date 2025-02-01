@@ -1,6 +1,7 @@
 use std::{fs, iter::zip, num::ParseIntError, path::PathBuf, str::FromStr};
 
 use itertools::Itertools;
+use rayon::prelude::*;
 
 pub fn day07(mut input_path: PathBuf) {
     input_path.push("07.txt");
@@ -35,8 +36,8 @@ fn part1(equations: &[Equation]) -> u64 {
 
 fn part2(equations: &[Equation]) -> u64 {
     equations
-        .iter()
-        .filter(|e| can_be_true(e, vec![Operator::Add, Operator::Multiply, Operator::Concat]))
+        .into_par_iter() // this gives speedup of x1.2
+        .filter(|e| can_be_true_par(e, vec![Operator::Add, Operator::Multiply, Operator::Concat]))
         .map(|e| e.result)
         .sum()
 }
@@ -60,25 +61,33 @@ fn is_true(equation: &Equation, operators: &[Operator]) -> bool {
         // we checked during parsing
         panic!("RHS needs at least one term");
     };
-
-    equation.result == zip(operators, tail).fold(*init, |acc, (&op, &t)| eval(acc, op, t))
-
     // Early stopping the fold when we exceed result is surprisingly not appreciably faster.
     // this try_fold is similar to (sum . filter ((>) result) . (scan foldop))
 
-    // zip(operators, tail)
-    //     .try_fold(*init, |acc, (&op, &t)| {
-    //         let s = eval(acc, op, t);
-    //         if s > equation.result {
-    //             return Err(s);
-    //         }
-    //         Ok(s)
-    //     })
-    //     .is_ok_and(|lhs| lhs == equation.result)
+    zip(operators, tail)
+        .try_fold(*init, |acc, (&op, &t)| {
+            let s = eval(acc, op, t);
+            if s > equation.result {
+                return Err(s);
+            }
+            Ok(s)
+        })
+        .is_ok_and(|lhs| lhs == equation.result)
 }
 
 fn can_be_true(equation: &Equation, options: Vec<Operator>) -> bool {
     operator_combinations_for(&equation, options).any(|ops| is_true(&equation, &ops))
+}
+
+fn can_be_true_par(equation: &Equation, options: Vec<Operator>) -> bool {
+    // because Combinations has mutable state, we cannot straightforwardly parallelize,
+    // this is not as well encapsulated by has a speedup of x2.5 (0.8 vs 0.3s).
+    // still, we only parallize per equation, could parallelize all
+    let n_ops = (equation.terms.len() - 1) as u32;
+    (0..options.len().pow(n_ops))
+        .into_par_iter()
+        .filter_map(|n| combinations_for(n, n_ops, &options))
+        .any(|ops| is_true(&equation, &ops))
 }
 
 fn operator_combinations_for(
@@ -89,7 +98,7 @@ fn operator_combinations_for(
 }
 
 struct Combinations<T> {
-    // TODO: Don't need to own that
+    // TODO: Don't need to own that, but would introduce lifetime woes (probably)
     options: Vec<T>,
     length: u32,
     current: usize,
@@ -109,19 +118,26 @@ impl<T: Copy> Iterator for Combinations<T> {
     type Item = Vec<T>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let k = self.options.len();
         self.current += 1;
-        if self.current > k.pow(self.length) {
-            return None;
-        }
-        let mut v: Vec<T> = Vec::with_capacity(self.length as usize);
-        let n = self.current - 1;
-        for i in 0..self.length {
-            // part 1 was easy, we could map bits to operation: n >> i & 1
-            v.push(self.options[(n / k.pow(i)) % k]);
-        }
-        Some(v)
+        combinations_for(self.current - 1, self.length, &self.options)
     }
+}
+
+fn combinations_for<T>(n: usize, len: u32, opts: &[T]) -> Option<Vec<T>>
+where
+    T: Copy,
+{
+    let k = opts.len();
+    if n >= k.pow(len) {
+        return None;
+    };
+
+    let mut v: Vec<T> = Vec::with_capacity(len as usize);
+    for i in 0..len {
+        // part 1 was easy, we could map bits to operation: n >> i & 1
+        v.push(opts[(n / k.pow(i)) % k]);
+    }
+    Some(v)
 }
 
 #[derive(Debug)]
