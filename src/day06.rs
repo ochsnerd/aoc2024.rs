@@ -12,6 +12,7 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::fs;
 use std::path::PathBuf;
+use tailcall::tailcall;
 
 pub fn day06(mut input_path: PathBuf) {
     input_path.push("06.txt");
@@ -391,6 +392,10 @@ impl Lines {
     }
 }
 
+// see https://stackoverflow.com/q/59257543 etc
+// also check out what happens if the recursive call is replaced with
+// would_loop(...) == true
+#[tailcall]
 // Would this setup result in a loop?
 fn would_loop(
     guard: Guard,

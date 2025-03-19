@@ -24,7 +24,7 @@ fn main() {
 	3 => day03::day03(input),
 	4 => day04::day04(input),
 	5 => day05::day05(input),
-	6 => day06::day06(input),
-	_ => day07::day07(input),
+	7 => day07::day07(input),
+	_ => day06::day06(input),
     }
 }
