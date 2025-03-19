@@ -6,6 +6,7 @@
 // - the 'functional' setup allows of trivial parallelization
 
 use itertools::Itertools;
+use tailcall::tailcall;
 use rayon::prelude::*;
 use std::collections::BTreeMap;
 use std::collections::HashMap;
@@ -391,6 +392,10 @@ impl Lines {
     }
 }
 
+// see https://stackoverflow.com/q/59257543 etc
+// also check out what happens if the recursive call is replaced with
+// would_loop(...) == true
+#[tailcall]
 // Would this setup result in a loop?
 fn would_loop(
     guard: Guard,
