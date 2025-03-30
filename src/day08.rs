@@ -2,13 +2,11 @@ use std::{
     cmp,
     collections::{HashMap, HashSet},
     fs,
-    path::PathBuf,
 };
 
 use itertools::iproduct;
 
-pub fn day08(mut input_path: PathBuf) {
-    input_path.push("08.txt");
+pub fn day08(input_path: String) {
     let content = fs::read_to_string(input_path).unwrap();
 
     let (antennas, corner) = read(&content);

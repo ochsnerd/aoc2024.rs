@@ -1,10 +1,9 @@
-use std::{fs, iter::zip, num::ParseIntError, path::PathBuf, str::FromStr};
+use std::{fs, iter::zip, num::ParseIntError, str::FromStr};
 
 use itertools::Itertools;
 use rayon::prelude::*;
 
-pub fn day07(mut input_path: PathBuf) {
-    input_path.push("07.txt");
+pub fn day07(input_path: String) {
     let content = fs::read_to_string(input_path).unwrap();
 
     let equations: Vec<Equation> = content.lines().map(|l| l.parse().unwrap()).collect();

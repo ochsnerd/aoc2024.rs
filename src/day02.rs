@@ -1,10 +1,8 @@
 use std::collections::HashMap;
 use std::fs;
 use std::hash::Hash;
-use std::path::PathBuf;
 
-pub fn day02(mut input_path: PathBuf) {
-    input_path.push("02.txt");
+pub fn day02(input_path: String) {
     let content = fs::read_to_string(input_path).unwrap();
     let input = parse_input(&content);
 

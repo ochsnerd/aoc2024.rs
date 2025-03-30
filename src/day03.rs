@@ -1,8 +1,6 @@
 use std::fs;
-use std::path::PathBuf;
 
-pub fn day03(mut input_path: PathBuf) {
-    input_path.push("03.txt");
+pub fn day03(input_path: String) {
     let content = fs::read_to_string(input_path).unwrap();
 
     println!(

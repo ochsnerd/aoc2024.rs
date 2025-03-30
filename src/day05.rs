@@ -1,11 +1,9 @@
 use std::collections::{HashMap, HashSet};
 use std::fs;
-use std::path::PathBuf;
 
 use itertools::Itertools;
 
-pub fn day05(mut input_path: PathBuf) {
-    input_path.push("05.txt");
+pub fn day05(input_path: String) {
     let input = fs::read_to_string(input_path).unwrap();
 
     let (rules, pages_list) = parse_input(&input);

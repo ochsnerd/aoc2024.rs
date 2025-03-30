@@ -11,11 +11,9 @@ use std::collections::BTreeMap;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::fs;
-use std::path::PathBuf;
 use tailcall::tailcall;
 
-pub fn day06(mut input_path: PathBuf) {
-    input_path.push("06.txt");
+pub fn day06(input_path: String) {
     let content = fs::read_to_string(input_path).unwrap();
 
     let (field, guard) = read(&content);
