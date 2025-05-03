@@ -11,6 +11,7 @@ mod day06;
 mod day07;
 mod day08;
 mod day09;
+mod day10;
 
 #[derive(Parser)]
 struct Args {
@@ -32,6 +33,7 @@ fn main() {
         6 => day06::day06(args.input_path),
         7 => day07::day07(args.input_path),
         8 => day08::day08(args.input_path),
-        _ => day09::day09(args.input_path),
+        9 => day09::day09(args.input_path),
+        _ => day10::day10(args.input_path),
     }
 }
