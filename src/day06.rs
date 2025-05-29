@@ -10,16 +10,12 @@ use rayon::prelude::*;
 use std::collections::BTreeMap;
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::fs;
 use tailcall::tailcall;
 
-pub fn day06(input_path: String) {
-    let content = fs::read_to_string(input_path).unwrap();
+pub fn day06(input: &str) -> (usize, usize) {
+    let (field, guard) = read(&input);
 
-    let (field, guard) = read(&content);
-
-    println!("{:?}", part1(&field, guard));
-    println!("{:?}", part2(&field, guard));
+    (part1(&field, guard), part2(&field, guard))
 }
 
 fn read(input: &str) -> (Field, Guard) {

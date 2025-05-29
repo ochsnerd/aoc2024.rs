@@ -1,15 +1,12 @@
-use std::{fs, iter::zip, num::ParseIntError, str::FromStr};
+use std::{iter::zip, num::ParseIntError, str::FromStr};
 
 use itertools::Itertools;
 use rayon::prelude::*;
 
-pub fn day07(input_path: String) {
-    let content = fs::read_to_string(input_path).unwrap();
+pub fn day07(input: &str) -> (usize, usize) {
+    let equations: Vec<Equation> = input.lines().map(|l| l.parse().unwrap()).collect();
 
-    let equations: Vec<Equation> = content.lines().map(|l| l.parse().unwrap()).collect();
-
-    println!("{:?}", part1(&equations));
-    println!("{:?}", part2(&equations));
+    (part1(&equations) as usize, part2(&equations) as usize)
 }
 
 #[derive(Debug)]

@@ -1,15 +1,14 @@
 use std::collections::{HashMap, HashSet};
-use std::fs;
 
 use itertools::Itertools;
 
-pub fn day05(input_path: String) {
-    let input = fs::read_to_string(input_path).unwrap();
-
+pub fn day05(input: &str) -> (usize, usize) {
     let (rules, pages_list) = parse_input(&input);
 
-    println!("{:?}", part1(&pages_list, &rules));
-    println!("{:?}", part2(&pages_list, &rules));
+    (
+        part1(&pages_list, &rules) as usize,
+        part2(&pages_list, &rules) as usize,
+    )
 }
 
 type Graph = HashMap<u32, HashSet<u32>>;

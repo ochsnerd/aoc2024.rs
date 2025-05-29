@@ -1,8 +1,5 @@
-use std::fs;
-
-pub fn day09(input_path: String) {
-    let content = fs::read_to_string(input_path).unwrap();
-    let numbers = content
+pub fn day09(input: &str) -> (usize, usize) {
+    let numbers = input
         .trim()
         .chars()
         .map(|c| c.to_digit(10).unwrap())
@@ -10,12 +7,12 @@ pub fn day09(input_path: String) {
 
     let mut disk = make_explicit_disk_map(&numbers);
     compact_p1(&mut disk);
-
-    println!("{:?}", checksum(&disk));
+    let p1 = checksum(&disk);
 
     let mut disk = make_explicit_disk_map(&numbers);
     compact_p2(&mut disk);
-    println!("{:?}", checksum(&disk));
+    let p2 = checksum(&disk);
+    (p1, p2)
 }
 
 type ExplicitDiskMap = Vec<Option<usize>>;
@@ -71,11 +68,12 @@ fn compact_p2(disk_map: &mut ExplicitDiskMap) {
 
         let end_of_first_spot = disk_map
             .iter()
-	    // ok these scan semantics are surprising (read: ass)
+            // ok these scan semantics are surprising (read: ass)
             .scan(0, |run, c| match c {
                 Some(_) => {
-		    *run = 0;
-		    Some(0)},
+                    *run = 0;
+                    Some(0)
+                }
                 None => {
                     *run += 1;
                     Some(*run)

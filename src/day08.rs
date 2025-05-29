@@ -1,18 +1,17 @@
 use std::{
     cmp,
     collections::{HashMap, HashSet},
-    fs,
 };
 
 use itertools::iproduct;
 
-pub fn day08(input_path: String) {
-    let content = fs::read_to_string(input_path).unwrap();
+pub fn day08(input: &str) -> (usize, usize) {
+    let (antennas, corner) = read(&input);
 
-    let (antennas, corner) = read(&content);
-
-    println!("{:?}", count_antinodes(&antennas, ((0, 0), corner), antinodes_part1));
-    println!("{:?}", count_antinodes(&antennas, ((0, 0), corner), antinodes_part2));
+    (
+        count_antinodes(&antennas, ((0, 0), corner), antinodes_part1),
+        count_antinodes(&antennas, ((0, 0), corner), antinodes_part2),
+    )
 }
 
 // Positive y-direction is up!
@@ -62,7 +61,7 @@ fn antinodes_part2(antennas: &[Position], bounds: (Position, Position)) -> Vec<P
         .filter(|(p1, p2)| p1 != p2)
         .flat_map(|((x1, y1), (x2, y2))| {
             (0..)
-                .map(move |i| ((i+1) * x1 - i * x2, (i+ 1) * y1 - i * y2))
+                .map(move |i| ((i + 1) * x1 - i * x2, (i + 1) * y1 - i * y2))
                 .take_while(|p| is_inside(*p, bounds))
         })
         .collect()

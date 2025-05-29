@@ -1,5 +1,7 @@
 #![feature(cmp_minmax)]
 
+use std::{fmt::Debug, fs, time::Instant};
+
 use clap::Parser;
 
 mod day01;
@@ -20,22 +22,72 @@ struct Args {
     day: u8,
 
     #[arg(short, long, default_value = "input")]
-    input_path: String,
+    input_base: String,
 }
+
+fn timed<F, R>(f: F, path: &str, label: &str)
+where
+    F: Fn(&str) -> R,
+    R: Debug,
+{
+    let n = 5;
+    let input = fs::read_to_string(path).unwrap();
+    let start = Instant::now();
+    for _ in 1..n {
+        f(&input);
+    }
+    let res = f(&input);
+    let end = Instant::now();
+    println!("{}: {:?}", label, res);
+    println!("Average: {:.2?}", (end - start) / 5);
+}
+
+fn call_timed(fn_and_label: (Solution, &str), base: &str) {
+    timed(fn_and_label.0, &format!("{}/{}.txt", base, fn_and_label.1), fn_and_label.1);
+}
+
+type Solution = fn(&str) -> (usize, usize);
 
 fn main() {
     let args = Args::parse();
-    match args.day {
-        1 => day01::day01(args.input_path),
-        2 => day02::day02(args.input_path),
-        3 => day03::day03(args.input_path),
-        4 => day04::day04(args.input_path),
-        5 => day05::day05(args.input_path),
-        6 => day06::day06(args.input_path),
-        7 => day07::day07(args.input_path),
-        8 => day08::day08(args.input_path),
-        9 => day09::day09(args.input_path),
-        10 => day10::day10(args.input_path),
-        _ => day11::day11(args.input_path),
+
+    let fn_and_labels: Vec<(Solution, &str)> = vec![
+        (day01::day01, "day01"),
+        (day02::day02, "day02"),
+        (day03::day03, "day03"),
+        (day04::day04, "day04"),
+        (day05::day05, "day05"),
+        (day06::day06, "day06"),
+        (day07::day07, "day07"),
+        (day08::day08, "day08"),
+        (day09::day09, "day09"),
+        (day10::day10, "day10"),
+        (day11::day11, "day11"),
+    ];
+
+    // underflow is fine
+    let index = args.day as usize - 1;
+    if let Some(&fn_and_label) = fn_and_labels.get(index) {
+        call_timed(fn_and_label, &args.input_base);
+    } else {
+        println!("Solving all...");
+        fn_and_labels
+            .iter()
+            .for_each(|&fn_and_label| call_timed(fn_and_label, &args.input_base));
     }
+
+    // match args.day {
+    //     d if 0 < d && d < 1 => call_timed(fn_and_labels[0], &args.input_path),
+    //     2 => timed(day02::day02, &args.input_path, "day2"),
+    //     3 => timed(day03::day03, &args.input_path, "day3"),
+    //     4 => timed(day04::day04, &args.input_path, "day4"),
+    //     5 => timed(day05::day05, &args.input_path, "day5"),
+    //     6 => timed(day06::day06, &args.input_path, "day6"),
+    //     7 => timed(day07::day07, &args.input_path, "day7"),
+    //     8 => timed(day08::day08, &args.input_path, "day8"),
+    //     9 => timed(day09::day09, &args.input_path, "day9"),
+    //     10 => timed(day10::day10, &args.input_path, "day10"),
+    //     11 => timed(day11::day11, &args.input_path, "day11"),
+    //     _ => println!("Day {} not implemented", args.day),
+    // }
 }
