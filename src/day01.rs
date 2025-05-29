@@ -1,16 +1,13 @@
 use std::collections::HashMap;
-use std::fs;
 use std::iter::zip;
 
-pub fn day01(input_path: String) {
-    let input: String = fs::read_to_string(input_path).unwrap();
+pub fn day01(input: &str) -> (usize, usize) {
     let (mut left, mut right) = parse_input(&input);
 
     left.sort();
     right.sort();
 
-    println!("Part 1: {}", part1(&left, &right));
-    println!("Part 2: {}", part2(&left, &right));
+    (part1(&left, &right) as usize, part2(&left, &right) as usize)
 }
 
 fn parse_input(input: &str) -> (Vec<u32>, Vec<u32>) {

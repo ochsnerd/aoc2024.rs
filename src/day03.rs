@@ -1,21 +1,27 @@
-use std::fs;
-
-pub fn day03(input_path: String) {
-    let content = fs::read_to_string(input_path).unwrap();
-
-    println!(
-        "{:?}",
-        parse_muls(&content).iter().map(|(a, b)| a * b).sum::<u32>()
-    );
+pub fn day03(input: &str) -> (usize, usize) {
+    (
+        parse_muls(&input, drop_until_part1)
+            .iter()
+            .map(|(a, b)| a * b)
+            .sum::<u32>() as usize,
+        parse_muls(&input, drop_until_part2)
+            .iter()
+            .map(|(a, b)| a * b)
+            .sum::<u32>() as usize,
+    )
 }
 
 type ParseState<'a> = (&'a str, bool);
 
-fn parse_muls(data: &str) -> Vec<(u32, u32)> {
+fn parse_muls<F>(data: &str, drop_until_start: F) -> Vec<(u32, u32)>
+where
+    F: for<'a> Fn(ParseState<'a>, &str) -> ParseState<'a>,
+{
     let mut results = Vec::new();
     let mut todo: ParseState = (data, true);
     while !todo.0.is_empty() {
-        match parse_next(todo) {
+        let after_drop = drop_until_start(todo, "mul(");
+        match parse_next(after_drop) {
             Ok((remaining, pair)) => {
                 results.push(pair);
                 todo = remaining;
@@ -29,12 +35,11 @@ fn parse_muls(data: &str) -> Vec<(u32, u32)> {
 }
 
 fn parse_next(data: ParseState) -> Result<(ParseState, (u32, u32)), ParseState> {
-    let r1 = drop_until_part2(data, "mul(");
-    let (r2, num1) = parse_int(r1)?;
-    let r3 = parse_prefix(r2, ',')?;
-    let (r4, num2) = parse_int(r3)?;
-    let r5 = parse_prefix(r4, ')')?;
-    Ok((r5, if r5.1 { (num1, num2) } else { (0, 0) }))
+    let (r1, num1) = parse_int(data)?;
+    let r2 = parse_prefix(r1, ',')?;
+    let (r3, num2) = parse_int(r2)?;
+    let r4 = parse_prefix(r3, ')')?;
+    Ok((r4, if r4.1 { (num1, num2) } else { (0, 0) }))
 }
 
 #[allow(dead_code)]

@@ -1,12 +1,7 @@
-use std::fs;
-
-pub fn day04(input_path: String) {
-    let input = fs::read_to_string(input_path).unwrap();
-
+pub fn day04(input: &str) -> (usize, usize) {
     let data = parse_input(&input);
 
-    println!("{:?}", part1(&data));
-    println!("{:?}", part2(&data));
+    (part1(&data), part2(&data))
 }
 
 // parse input into vector-of-vectors for easier transpose etc.

@@ -1,13 +1,9 @@
 use std::collections::{HashMap, HashSet};
-use std::fs;
 use std::hash::Hash;
 
-pub fn day02(input_path: String) {
-    let content = fs::read_to_string(input_path).unwrap();
-    let input = parse_input(&content);
-
-    println!("Part 1 {}", part1(&input));
-    println!("Part 2 {}", part2(&input));
+pub fn day02(input: &str) -> (usize, usize) {
+    let input = parse_input(input);
+    (part1(&input), part2(&input))
 }
 
 fn parse_input(input: &str) -> Vec<Vec<i32>> {

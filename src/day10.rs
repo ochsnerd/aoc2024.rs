@@ -1,12 +1,9 @@
-use std::{collections::HashSet, fs};
+use std::collections::HashSet;
 
-pub fn day10(input_path: String) {
-    let content = fs::read_to_string(input_path).unwrap();
+pub fn day10(input: &str) -> (usize, usize) {
+    let map = Map::new(&input);
 
-    let map = Map::new(&content);
-
-    println!("{:?}", part1(&map));
-    println!("{:?}", part2(&map));
+    (part1(&map), part2(&map))
 }
 
 fn part1(map: &Map) -> usize {

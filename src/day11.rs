@@ -1,23 +1,20 @@
-use std::{collections::HashMap, fs, hash::Hash, num::ParseIntError, ops::AddAssign, str::FromStr};
+use std::{collections::HashMap, hash::Hash, num::ParseIntError, ops::AddAssign, str::FromStr};
 
-pub fn day11(input_path: String) {
-    let content = fs::read_to_string(input_path).unwrap();
-
-    let stones: Vec<_> = content
+pub fn day11(input: &str) -> (usize, usize) {
+    let stones: Vec<_> = input
         .split_whitespace()
         .map(|l| l.parse().unwrap())
         .collect();
 
-    println!("{:?}", part1(stones.iter().cloned().collect()));
-    println!("{:?}", part2(&stones));
+    let _p1 = part1(stones.iter().cloned().collect());
+    let _p2 = part2(&stones);
 
-    let stones: Vec<_> = content
+    let stones: Vec<_> = input
         .split_whitespace()
         .map(|l| l.parse().unwrap()) // this deduces Stone2 because of the signature of part12
         .collect();
 
-    println!("{:?}", part12(&stones));
-    println!("{:?}", part22(&stones));
+    (part12(&stones), part22(&stones))
 }
 
 // Most significant digit is last,
