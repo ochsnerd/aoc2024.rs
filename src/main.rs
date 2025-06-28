@@ -1,4 +1,8 @@
 #![feature(cmp_minmax)]
+#![feature(option_zip)]
+
+#[macro_use]
+extern crate static_assertions;
 
 use std::{fmt::Debug, fs, time::Instant};
 
@@ -16,6 +20,7 @@ mod day09;
 mod day10;
 mod day11;
 mod day12;
+mod day13;
 
 #[derive(Parser)]
 struct Args {
@@ -77,6 +82,7 @@ fn main() {
         (day10::day10, "day10"),
         (day11::day11, "day11"),
         (day12::day12, "day12"),
+        (day13::day13, "day13"),
     ];
 
     // underflow is fine

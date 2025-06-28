@@ -9,4 +9,6 @@ edition = "2021"
 clap = { version = "4.4", features = ["derive"] }
 itertools = "0.14.0"
 rayon = "1.8"
+static_assertions = "1.1.0"
 tailcall = "1.0.1"
+thiserror = "2.0.12"
