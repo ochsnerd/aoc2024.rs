@@ -1,4 +1,4 @@
-pub fn day04(input: &str) -> (usize, usize) {
+pub fn solve(input: &str) -> (usize, usize) {
     let data = parse_input(&input);
 
     (part1(&data), part2(&data))

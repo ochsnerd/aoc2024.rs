@@ -5,7 +5,7 @@ use std::{
 
 use itertools::iproduct;
 
-pub fn day08(input: &str) -> (usize, usize) {
+pub fn solve(input: &str) -> (usize, usize) {
     let (antennas, corner) = read(&input);
 
     (

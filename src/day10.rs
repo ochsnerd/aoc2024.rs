@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-pub fn day10(input: &str) -> (usize, usize) {
+pub fn solve(input: &str) -> (usize, usize) {
     let map = Map::new(&input);
 
     (part1(&map), part2(&map))

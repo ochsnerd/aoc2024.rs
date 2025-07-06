@@ -4,7 +4,7 @@ use std::{
     ops::Index,
 };
 
-pub fn day12(input: &str) -> (usize, usize) {
+pub fn solve(input: &str) -> (usize, usize) {
     let garden = Garden::new(input);
 
     (part1(&garden), part2(&garden))

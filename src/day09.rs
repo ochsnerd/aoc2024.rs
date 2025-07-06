@@ -1,4 +1,4 @@
-pub fn day09(input: &str) -> (usize, usize) {
+pub fn solve(input: &str) -> (usize, usize) {
     let numbers = input
         .trim()
         .chars()

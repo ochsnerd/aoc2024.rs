@@ -70,19 +70,19 @@ fn main() {
     let args = Args::parse();
 
     let fn_and_labels: Vec<(Solution, &str)> = vec![
-        (day01::day01, "day01"),
-        (day02::day02, "day02"),
-        (day03::day03, "day03"),
-        (day04::day04, "day04"),
-        (day05::day05, "day05"),
-        (day06::day06, "day06"),
-        (day07::day07, "day07"),
-        (day08::day08, "day08"),
-        (day09::day09, "day09"),
-        (day10::day10, "day10"),
-        (day11::day11, "day11"),
-        (day12::day12, "day12"),
-        (day13::day13, "day13"),
+        (day01::solve, "day01"),
+        (day02::solve, "day02"),
+        (day03::solve, "day03"),
+        (day04::solve, "day04"),
+        (day05::solve, "day05"),
+        (day06::solve, "day06"),
+        (day07::solve, "day07"),
+        (day08::solve, "day08"),
+        (day09::solve, "day09"),
+        (day10::solve, "day10"),
+        (day11::solve, "day11"),
+        (day12::solve, "day12"),
+        (day13::solve, "day13"),
     ];
 
     // underflow is fine

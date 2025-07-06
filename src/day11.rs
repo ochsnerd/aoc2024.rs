@@ -1,6 +1,6 @@
 use std::{collections::HashMap, hash::Hash, num::ParseIntError, ops::AddAssign, str::FromStr};
 
-pub fn day11(input: &str) -> (usize, usize) {
+pub fn solve(input: &str) -> (usize, usize) {
     let stones: Vec<_> = input
         .split_whitespace()
         .map(|l| l.parse().unwrap())

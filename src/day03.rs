@@ -1,4 +1,4 @@
-pub fn day03(input: &str) -> (usize, usize) {
+pub fn solve(input: &str) -> (usize, usize) {
     (
         parse_muls(&input, drop_until_part1)
             .iter()

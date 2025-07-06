@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::iter::zip;
 
-pub fn day01(input: &str) -> (usize, usize) {
+pub fn solve(input: &str) -> (usize, usize) {
     let (mut left, mut right) = parse_input(&input);
 
     left.sort();

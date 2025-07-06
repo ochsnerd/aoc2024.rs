@@ -9,7 +9,7 @@ const PART2_SHIFT: StoreInt = 10000000000000;
 const_assert!(u64::MAX > 2 * PART2_SHIFT);
 const_assert!(i128::MAX > 4 * PART2_SHIFT as CalcInt * PART2_SHIFT as CalcInt);
 
-pub fn day13(input: &str) -> (usize, usize) {
+pub fn solve(input: &str) -> (usize, usize) {
     let machines = Machine::parse_all(input)
         .filter_map(|m| m.ok())
         .collect::<Vec<_>>();

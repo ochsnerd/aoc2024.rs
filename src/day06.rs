@@ -12,7 +12,7 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use tailcall::tailcall;
 
-pub fn day06(input: &str) -> (usize, usize) {
+pub fn solve(input: &str) -> (usize, usize) {
     let (field, guard) = read(&input);
 
     (part1(&field, guard), part2(&field, guard))

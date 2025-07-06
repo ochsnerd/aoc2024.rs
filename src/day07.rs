@@ -3,7 +3,7 @@ use std::{iter::zip, num::ParseIntError, str::FromStr};
 use itertools::Itertools;
 use rayon::prelude::*;
 
-pub fn day07(input: &str) -> (usize, usize) {
+pub fn solve(input: &str) -> (usize, usize) {
     let equations: Vec<Equation> = input.lines().map(|l| l.parse().unwrap()).collect();
 
     (part1(&equations) as usize, part2(&equations) as usize)

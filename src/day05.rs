@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use itertools::Itertools;
 
-pub fn day05(input: &str) -> (usize, usize) {
+pub fn solve(input: &str) -> (usize, usize) {
     let (rules, pages_list) = parse_input(&input);
 
     (

@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use std::hash::Hash;
 
-pub fn day02(input: &str) -> (usize, usize) {
+pub fn solve(input: &str) -> (usize, usize) {
     let input = parse_input(input);
     (part1(&input), part2(&input))
 }
