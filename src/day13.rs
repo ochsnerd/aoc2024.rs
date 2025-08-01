@@ -11,8 +11,8 @@ const_assert!(i128::MAX > 4 * PART2_SHIFT as CalcInt * PART2_SHIFT as CalcInt);
 
 pub fn solve(input: &str) -> (usize, usize) {
     let machines = Machine::parse_all(input)
-        .filter_map(|m| m.ok())
-        .collect::<Vec<_>>();
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
 
     (part1(&machines), part2(&machines))
 }
@@ -43,16 +43,6 @@ struct Machine {
     prize: [StoreInt; 2],
     a_action: [StoreInt; 2],
     b_action: [StoreInt; 2],
-}
-
-#[derive(Error, Debug)]
-enum MachineParseError {
-    #[error("Wrong Format")]
-    WrongNumberFormat(#[from] ParseIntError),
-    #[error("Wrong Format")]
-    WrongFormat,
-    #[error("Not enough Data")]
-    NotEnoughData,
 }
 
 impl Machine {
@@ -86,6 +76,16 @@ impl Machine {
     }
 }
 
+#[derive(Error, Debug)]
+enum MachineParseError {
+    #[error("Wrong Format")]
+    WrongNumberFormat(#[from] ParseIntError),
+    #[error("Wrong Format")]
+    WrongFormat,
+    #[error("Not enough Data")]
+    NotEnoughData,
+}
+
 impl FromStr for Machine {
     type Err = MachineParseError;
 
@@ -93,7 +93,7 @@ impl FromStr for Machine {
         fn parse_button(line: &str, name: &str) -> Result<(StoreInt, StoreInt), MachineParseError> {
             line.strip_prefix(&format!("Button {}: X+", name))
                 .and_then(|rest| rest.split_once(", Y+"))
-                .ok_or(MachineParseError::WrongFormat) // Would want WrongFormat, but then the typechecker gets confused
+                .ok_or(MachineParseError::WrongFormat)
                 .and_then(|(x, y)| Ok((x.parse()?, y.parse()?)))
         }
 
