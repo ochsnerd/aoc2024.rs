@@ -1,7 +1,7 @@
 use core::fmt;
 
 use crate::{
-    grid::{dyadic, Direction, Grid, GridParser, Index, Point, Vector},
+    grid::{Direction, Grid, GridParseError, GridParser, Index, Point, Vector},
     util::bfs,
 };
 
@@ -49,12 +49,13 @@ struct Warehouse {
 impl Warehouse {
     fn new(plan: &str) -> Warehouse {
         // Here we iterate twice over plan - this not cost a meaningful amount of time
-        let map = GridParser::from([
-            ('#', Thing::Wall),
-            ('.', Thing::Floor),
-            ('O', Thing::Box),
-            ('@', Thing::Floor),
-        ])
+        let map = GridParser::new(|c| match c {
+            '#' => Ok(Thing::Wall),
+            '.' => Ok(Thing::Floor),
+            'O' => Ok(Thing::Box),
+            '@' => Ok(Thing::Floor),
+            _ => Err(GridParseError),
+        })
         .parse(plan)
         .unwrap();
         Warehouse {
@@ -63,7 +64,7 @@ impl Warehouse {
                 .flat_map(|l| l.chars())
                 .enumerate()
                 .filter_map(|(i, c)| match c {
-                    '@' => Some(dyadic(map.size, i).try_into().unwrap()),
+                    '@' => Some(map.make_index(i).try_into().unwrap()),
                     _ => None,
                 })
                 .next()
@@ -214,25 +215,21 @@ fn parse(input: &str) -> (Warehouse, Vec<Direction>) {
 
 impl fmt::Display for Warehouse2 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        fn to_char(t: Thing2) -> char {
-            match t {
-                Thing2::Wall => '#',
-                Thing2::BoxLeft => '[',
-                Thing2::BoxRight => ']',
-                Thing2::Floor => '.',
-            }
-        }
         let robot = self.robot.try_into().unwrap();
-        for row in self.map.iter_indices_by_rows().into_iter() {
-            for idx in row {
-                if idx == robot {
-                    write!(f, "@")?;
-                } else {
-                    write!(f, "{}", to_char(self.map[idx]))?;
+        write!(
+            f,
+            "{}",
+            self.map.display(
+                |i| if i == robot { Some('@') } else { None },
+                |t| match t {
+                    Thing2::Wall => '#',
+                    Thing2::BoxLeft => '[',
+                    Thing2::BoxRight => ']',
+                    Thing2::Floor => '.',
                 }
-            }
-            write!(f, "\n")?;
-        }
+            )
+        )?;
+
         Ok(())
     }
 }

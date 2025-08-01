@@ -1,5 +1,5 @@
 use std::{
-    collections::HashMap,
+    fmt,
     hash::Hash,
     num::TryFromIntError,
     ops::{Add, AddAssign, IndexMut},
@@ -12,11 +12,11 @@ pub type Size = (usize, usize);
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Index((usize, usize));
 
-pub fn monadic(size: Size, index: Index) -> usize {
+fn monadic(size: Size, index: Index) -> usize {
     index.0 .0 + index.0 .1 * size.0
 }
 
-pub fn dyadic(size: Size, index: usize) -> Index {
+fn dyadic(size: Size, index: usize) -> Index {
     Index((index % size.0, index / size.0))
 }
 
@@ -48,7 +48,7 @@ pub struct Grid<T> {
 impl<T> Grid<T> {
     pub fn new(size: Size, elements: Vec<T>) -> Grid<T> {
         if size.0 * size.1 != elements.len() {
-            panic!("Misatched size");
+            panic!("Mismatched size");
         }
         Grid { size, elements }
     }
@@ -79,42 +79,86 @@ impl<T> Grid<T> {
         let rows = self.size.0;
         self.iter_indices().chunks(rows)
     }
-}
 
-pub struct GridParser<T> {
-    mapping: HashMap<char, T>,
-}
-
-impl<T: Copy, const N: usize> From<[(char, T); N]> for GridParser<T> {
-    fn from(arr: [(char, T); N]) -> Self {
-        Self::new(arr.into())
+    pub fn make_index(&self, monadic: usize) -> Index {
+        dyadic(self.size, monadic)
     }
+
+    pub fn display<'a, O, M>(&'a self, overlay: O, mapping: M) -> GridDisplayer<'a, M, O, T>
+    where
+        O: Fn(Index) -> Option<char>,
+        M: Fn(&T) -> char,
+    {
+        GridDisplayer::new(mapping, overlay, &self)
+    }
+}
+
+pub struct GridParser<M> {
+    mapping: M,
 }
 
 #[derive(Debug)]
 pub struct GridParseError;
 
-impl<T: Copy> GridParser<T> {
-    pub fn new(mapping: HashMap<char, T>) -> Self {
+impl<M: FnMut(char) -> Result<T, GridParseError>, T> GridParser<M> {
+    pub fn new(mapping: M) -> Self {
         Self { mapping }
     }
 
-    pub fn parse(self, s: &str) -> Result<Grid<T>, GridParseError> {
+    pub fn parse(mut self, s: &str) -> Result<Grid<T>, GridParseError> {
         let lines: Vec<_> = s.lines().collect();
         if lines.is_empty() {
             return Ok(Grid::new((0, 0), Vec::new()));
         }
         let size = (lines[0].len(), lines.len());
-        let things: Option<Vec<_>> = lines
+        let things: Vec<_> = lines
             .into_iter()
             .flat_map(|v| v.chars())
-            .map(|c| self.mapping.get(&c).map(|t| *t))
-            .collect();
+            .map(|c| (self.mapping)(c))
+            .collect::<Result<Vec<_>, _>>()?;
 
-        match things {
-            Some(things) => Ok(Grid::new(size, things)),
-            None => Err(GridParseError),
+        Ok(Grid::new(size, things))
+    }
+}
+
+pub struct GridDisplayer<'a, M, O, T> {
+    mapping: M,
+    overlay: O,
+    grid: &'a Grid<T>,
+}
+
+impl<'a, M, O, T> GridDisplayer<'a, M, O, T>
+where
+    M: Fn(&T) -> char,
+    O: Fn(Index) -> Option<char>,
+{
+    pub fn new(mapping: M, overlay: O, grid: &'a Grid<T>) -> Self {
+        Self {
+            mapping,
+            overlay,
+            grid,
         }
+    }
+}
+
+impl<'a, M, O, T> fmt::Display for GridDisplayer<'a, M, O, T>
+where
+    // I would like to have this a FnMut (as it is Map),
+    // but the fmt::Display-interface forbids that
+    M: Fn(&T) -> char,
+    O: Fn(Index) -> Option<char>,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for row in self.grid.iter_indices_by_rows().into_iter() {
+            writeln!(
+                f,
+                "{}",
+                row.into_iter()
+                    .map(|i| ((self.overlay)(i)).unwrap_or_else(|| (self.mapping)(&self.grid[i])))
+                    .collect::<String>()
+            )?;
+        }
+        Ok(())
     }
 }
 
