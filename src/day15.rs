@@ -1,8 +1,8 @@
 use core::fmt;
 
 use crate::{
+    graph::bfs,
     grid::{Direction, Grid, GridParseError, GridParser, Index, Point, Vector},
-    util::bfs,
 };
 
 pub fn solve(input: &str) -> (usize, usize) {
