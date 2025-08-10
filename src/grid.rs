@@ -9,7 +9,7 @@ use itertools::{IntoChunks, Itertools};
 
 pub type Size = (usize, usize);
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Index((usize, usize));
 
 fn monadic(size: Size, index: Index) -> usize {
@@ -20,12 +20,54 @@ fn dyadic(size: Size, index: usize) -> Index {
     Index((index % size.0, index / size.0))
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Direction {
     Up,
     Right,
     Down,
     Left,
+}
+
+impl Direction {
+    pub fn all() -> [Direction; 4] {
+        static DIRECTIONS: [Direction; 4] = [
+            Direction::Up,
+            Direction::Right,
+            Direction::Down,
+            Direction::Left,
+        ];
+        DIRECTIONS.clone()
+    }
+
+    pub fn clockwise(self) -> Self {
+        match self {
+            Direction::Up => Direction::Right,
+            Direction::Right => Direction::Down,
+            Direction::Down => Direction::Left,
+            Direction::Left => Direction::Up,
+        }
+    }
+
+    pub fn anti_clockwise(self) -> Self {
+        match self {
+            Direction::Up => Direction::Left,
+            Direction::Right => Direction::Up,
+            Direction::Down => Direction::Right,
+            Direction::Left => Direction::Down,
+        }
+    }
+}
+
+impl Index {
+    pub fn neighbor(self, dir: Direction) -> Index {
+        let (x, y) = self.into();
+        match dir {
+            Direction::Up => Self((x, y - 1)),
+            Direction::Right => Self((x + 1, y)),
+            Direction::Down => Self((x, y + 1)),
+            Direction::Left => Self((x - 1, y)),
+        }
+    }
 }
 
 impl Into<Vector> for Direction {
