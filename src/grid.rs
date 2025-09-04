@@ -126,12 +126,11 @@ impl<T> Grid<T> {
         dyadic(self.size, monadic)
     }
 
-    pub fn display<'a, O, M>(&'a self, overlay: O, mapping: M) -> GridDisplayer<'a, M, O, T>
+    pub fn display<'a, M>(&'a self, mapping: M) -> GridDisplayer<'a, M, T>
     where
-        O: Fn(Index) -> Option<char>,
-        M: Fn(&T) -> char,
+        M: Fn(&T, Index) -> char,
     {
-        GridDisplayer::new(mapping, overlay, &self)
+        GridDisplayer::new(mapping, &self)
     }
 }
 
@@ -163,32 +162,25 @@ impl<M: FnMut(char) -> Result<T, GridParseError>, T> GridParser<M> {
     }
 }
 
-pub struct GridDisplayer<'a, M, O, T> {
+pub struct GridDisplayer<'a, M, T> {
     mapping: M,
-    overlay: O,
     grid: &'a Grid<T>,
 }
 
-impl<'a, M, O, T> GridDisplayer<'a, M, O, T>
+impl<'a, M, T> GridDisplayer<'a, M, T>
 where
-    M: Fn(&T) -> char,
-    O: Fn(Index) -> Option<char>,
+    M: Fn(&T, Index) -> char,
 {
-    pub fn new(mapping: M, overlay: O, grid: &'a Grid<T>) -> Self {
-        Self {
-            mapping,
-            overlay,
-            grid,
-        }
+    pub fn new(mapping: M, grid: &'a Grid<T>) -> Self {
+        Self { mapping, grid }
     }
 }
 
-impl<'a, M, O, T> fmt::Display for GridDisplayer<'a, M, O, T>
+impl<'a, M, T> fmt::Display for GridDisplayer<'a, M, T>
 where
     // I would like to have this a FnMut (as it is Map),
     // but the fmt::Display-interface forbids that
-    M: Fn(&T) -> char,
-    O: Fn(Index) -> Option<char>,
+    M: Fn(&T, Index) -> char,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for row in self.grid.iter_indices_by_rows().into_iter() {
@@ -196,7 +188,7 @@ where
                 f,
                 "{}",
                 row.into_iter()
-                    .map(|i| ((self.overlay)(i)).unwrap_or_else(|| (self.mapping)(&self.grid[i])))
+                    .map(|i| (self.mapping)(&self.grid[i], i))
                     .collect::<String>()
             )?;
         }

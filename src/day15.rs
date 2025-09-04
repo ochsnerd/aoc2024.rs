@@ -6,22 +6,19 @@ use crate::{
 };
 
 pub fn solve(input: &str) -> (usize, usize) {
-    let (mut warehouse, movements) = parse(input);
-    let mut warehouse2 = warehouse.clone().into_part2();
-    (
-        part1(&mut warehouse, &movements),
-        part2(&mut warehouse2, &movements),
-    )
+    let (warehouse, movements) = parse(input);
+    let warehouse2 = warehouse.make_part2();
+    (part1(warehouse, &movements), part2(warehouse2, &movements))
 }
 
-fn part1(warehouse: &mut Warehouse, movements: &[Direction]) -> usize {
+fn part1(mut warehouse: Warehouse, movements: &[Direction]) -> usize {
     for &m in movements.into_iter() {
         warehouse.do_move(m)
     }
     warehouse.score()
 }
 
-fn part2(warehouse: &mut Warehouse2, movements: &[Direction]) -> usize {
+fn part2(mut warehouse: Warehouse2, movements: &[Direction]) -> usize {
     for &m in movements.into_iter() {
         warehouse.do_move(m)
     }
@@ -100,14 +97,14 @@ impl Warehouse {
             .sum()
     }
 
-    fn into_part2(self) -> Warehouse2 {
+    fn make_part2(&self) -> Warehouse2 {
         Warehouse2 {
             robot: self.robot.scaled_x(2),
             map: Grid::new(
                 (self.map.size.0 * 2, self.map.size.1),
                 self.map
                     .elements
-                    .into_iter()
+                    .iter()
                     .flat_map(|t| match t {
                         Thing::Wall => [Thing2::Wall, Thing2::Wall],
                         Thing::Box => [Thing2::BoxLeft, Thing2::BoxRight],
@@ -219,15 +216,13 @@ impl fmt::Display for Warehouse2 {
         write!(
             f,
             "{}",
-            self.map.display(
-                |i| if i == robot { Some('@') } else { None },
-                |t| match t {
-                    Thing2::Wall => '#',
-                    Thing2::BoxLeft => '[',
-                    Thing2::BoxRight => ']',
-                    Thing2::Floor => '.',
-                }
-            )
+            self.map.display(|t, i| match (t, i) {
+                (_, i) if i == robot => '@',
+                (Thing2::Wall, _) => '#',
+                (Thing2::BoxLeft, _) => '[',
+                (Thing2::BoxRight, _) => ']',
+                (Thing2::Floor, _) => '.',
+            })
         )?;
 
         Ok(())
