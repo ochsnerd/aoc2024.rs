@@ -76,7 +76,7 @@ fn part1(start: Pose, end: Index, map: &Grid<Thing>) -> (Direction, usize) {
         .map(|e| {
             (
                 e.heading,
-                dijkstra(start.clone(), |p| movements(p, map), e)
+                dijkstra(start.clone(), |p| movements(p, map), |n| *n == e)
                     .unwrap() // we're sure there's a way to the end
                     .collect::<Vec<_>>(),
             )

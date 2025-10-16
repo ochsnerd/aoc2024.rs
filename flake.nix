@@ -18,7 +18,7 @@
       in
         {
           devShells.default = pkgs.mkShell rec {
-            nativeBuildInputs = [ pkgs.pkg-config ];
+            nativeBuildInputs = with pkgs; [ pkg-config expat fontconfig ];
             buildInputs = with pkgs; [
               clang
               llvmPackages.bintools

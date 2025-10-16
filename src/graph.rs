@@ -143,12 +143,17 @@ impl Ord for Cost {
     }
 }
 
-pub fn dijkstra<N, F, U>(start: N, mut neighbors: F, end: N) -> Option<impl Iterator<Item = N>>
+pub fn dijkstra<N, F, U, P>(
+    start: N,
+    mut neighbors: F,
+    mut end: P,
+) -> Option<impl Iterator<Item = N>>
 where
     // I don't like that we need Ord, but as a tiebreaker for the heap it seems necessary
     N: Eq + Hash + Clone + Ord + Debug,
     F: FnMut(&N) -> U,
     U: IntoIterator<Item = (usize, N)>,
+    P: FnMut(&N) -> bool,
 {
     // Implementation adapted from
     // https://doc.rust-lang.org/std/collections/binary_heap/index.html#examples
@@ -164,9 +169,9 @@ where
     path_to.insert(start.clone(), (0.into(), None));
 
     while let Some(BoundaryNode { cost, node }) = boundary.pop() {
-        if node == end {
+        if end(&node) {
             return Some(
-                std::iter::successors(Some(end), |n| path_to.remove(n).and_then(|e| e.1))
+                std::iter::successors(Some(node), |n| path_to.remove(n).and_then(|e| e.1))
                     // collect into a vector so that the (potentially large)
                     // hashmap can be dropped
                     .collect::<Vec<_>>()
@@ -381,7 +386,7 @@ mod tests {
         let graph = create_simple_graph();
         let neighbors = |node: &i32| graph.get(node).cloned().unwrap_or_default();
 
-        let result = dijkstra(1, neighbors, 5);
+        let result = dijkstra(1, neighbors, |node| *node == 5);
         assert!(result.is_some());
 
         let path: Vec<i32> = result.unwrap().collect();
@@ -393,7 +398,7 @@ mod tests {
         let graph = create_simple_graph();
         let neighbors = |node: &i32| graph.get(node).cloned().unwrap_or_default();
 
-        let result = dijkstra(1, neighbors, 1);
+        let result = dijkstra(1, neighbors, |node| *node == 1);
         assert!(result.is_some());
 
         let path: Vec<i32> = result.unwrap().collect();
@@ -410,7 +415,7 @@ mod tests {
 
         let neighbors = |node: &i32| graph.get(node).cloned().unwrap_or_default();
 
-        let result = dijkstra(1, neighbors, 3);
+        let result = dijkstra(1, neighbors, |node| *node == 3);
         assert!(result.is_none());
     }
 
@@ -418,7 +423,7 @@ mod tests {
     fn test_single_node_graph() {
         let neighbors = |_node: &i32| vec![];
 
-        let result = dijkstra(42, neighbors, 42);
+        let result = dijkstra(42, neighbors, |node| *node == 42);
         assert!(result.is_some());
 
         let path: Vec<i32> = result.unwrap().collect();
@@ -435,7 +440,7 @@ mod tests {
 
         let neighbors = |node: &i32| graph.get(node).cloned().unwrap_or_default();
 
-        let result = dijkstra(1, neighbors, 4);
+        let result = dijkstra(1, neighbors, |node| *node == 4);
         assert!(result.is_some());
 
         let path: Vec<i32> = result.unwrap().collect();
@@ -453,7 +458,7 @@ mod tests {
 
         let neighbors = |node: &i32| graph.get(node).cloned().unwrap_or_default();
 
-        let result = dijkstra(1, neighbors, 3);
+        let result = dijkstra(1, neighbors, |node| *node == 3);
         assert!(result.is_some());
 
         let path: Vec<i32> = result.unwrap().collect();
@@ -469,7 +474,7 @@ mod tests {
 
         let neighbors = |node: &String| graph.get(node).cloned().unwrap_or_default();
 
-        let result = dijkstra("start".to_string(), neighbors, "end".to_string());
+        let result = dijkstra("start".to_string(), neighbors, |node| node == "end");
         assert!(result.is_some());
 
         let path: Vec<String> = result.unwrap().collect();
@@ -491,7 +496,7 @@ mod tests {
 
         let neighbors = |node: &char| graph.get(node).cloned().unwrap_or_default();
 
-        let result = dijkstra('A', neighbors, 'F');
+        let result = dijkstra('A', neighbors, |node| *node == 'F');
         assert!(result.is_some());
 
         let path: Vec<char> = result.unwrap().collect();
@@ -509,7 +514,7 @@ mod tests {
 
         let neighbors = |node: &i32| graph.get(node).cloned().unwrap_or_default();
 
-        let result = dijkstra(1, neighbors, 3);
+        let result = dijkstra(1, neighbors, |node| *node == 3);
         assert!(result.is_some());
 
         let path: Vec<i32> = result.unwrap().collect();
@@ -525,7 +530,7 @@ mod tests {
 
         let neighbors = |node: &i32| graph.get(node).cloned().unwrap_or_default();
 
-        let result = dijkstra(1, neighbors, 3);
+        let result = dijkstra(1, neighbors, |node| *node == 3);
         assert!(result.is_some());
 
         let path: Vec<i32> = result.unwrap().collect();
@@ -542,7 +547,7 @@ mod tests {
 
         let neighbors = |node: &i32| graph.get(node).cloned().unwrap_or_default();
 
-        let result = dijkstra(1, neighbors, 4);
+        let result = dijkstra(1, neighbors, |node| *node == 4);
         assert!(result.is_some());
 
         let path: Vec<i32> = result.unwrap().collect();
@@ -553,7 +558,7 @@ mod tests {
     fn test_empty_neighbors_closure() {
         let neighbors = |_node: &i32| vec![];
 
-        let result = dijkstra(1, neighbors, 2);
+        let result = dijkstra(1, neighbors, |node| *node == 2);
         assert!(result.is_none());
     }
 
@@ -565,7 +570,7 @@ mod tests {
             _ => vec![],
         };
 
-        let result = dijkstra(1, neighbors, 2);
+        let result = dijkstra(1, neighbors, |node| *node == 2);
         assert!(result.is_some());
 
         let path: Vec<i32> = result.unwrap().collect();
@@ -590,7 +595,9 @@ mod tests {
             _ => vec![],
         };
 
-        let result = dijkstra(start.clone(), neighbors, end.clone());
+        let result = dijkstra(start.clone(), neighbors, |point| {
+            point.x == 1 && point.y == 1
+        });
         assert!(result.is_some());
 
         let path: Vec<Point> = result.unwrap().collect();

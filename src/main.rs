@@ -28,6 +28,7 @@ mod day13;
 mod day14;
 mod day15;
 mod day16;
+mod day17;
 
 #[derive(Parser)]
 struct Args {
@@ -93,6 +94,7 @@ fn main() {
         (day14::solve, "day14"),
         (day15::solve, "day15"),
         (day16::solve, "day16"),
+        (day17::solve, "day17"),
     ];
 
     // underflow is fine

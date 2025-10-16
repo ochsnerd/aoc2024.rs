@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
 itertools = "0.14.0"
+plotters = "0.3.7"
 rayon = "1.8"
 static_assertions = "1.1.0"
 tailcall = "1.0.1"
